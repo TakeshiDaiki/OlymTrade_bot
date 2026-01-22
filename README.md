@@ -70,7 +70,7 @@ Selenium WebDriver
 
 🚀 Quick Start
 
-git clone https://github.com/TakeshiDaiki/sniper-bot.git
+git clone https://github.com/TakeshiDaiki/OlymTrade_bot
 cd sniper-bot
 pip install -r requirements.txt
 python main.py
