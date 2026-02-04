@@ -15,6 +15,24 @@ Dynamic Stop Loss and daily trade limit management
 
 Modular, production-ready codebase suitable for portfolio projects
 
+## 🚀 Getting Started (Portable Version)
+
+If you downloaded the `.zip` release, you don't need to install Python or any dependencies:
+
+1. **Extract** the ZIP file to a folder of your choice.
+2. **Open** `config.py` with any text editor (like Notepad) to adjust your trading parameters.
+3. **Run** `SniperBot_Olymp.exe` to start the application.
+
+## ⚙️ Configuration
+
+One of the best features of this bot is that you can customize it without recompiling. Locate the `config.py` file in the main folder to modify:
+
+* **Candle Settings:** Change the timeframe for analysis.
+* **Strategy Parameters:** Adjust ZigZag deviation and indicator sensitivity.
+* **Technical Limits:** Define minimum history required before the first trade.
+
+> **Note:** The bot reads this file every time the engine starts, so you can tweak your strategy on the fly!
+
 ⚙️ Core Functionality
 
 Real-time OHLC candlestick fetching
