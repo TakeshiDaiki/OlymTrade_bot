@@ -68,12 +68,26 @@ Chrome Browser
 
 Selenium WebDriver
 
+🛠️ Installation & Usage
+For Users (Standalone EXE)
+Go to the Releases section in this repository.
+
+Download the SniperBot_v1_Build.zip.
+
+Extract the folder and run SniperBot_Olymp.exe.
+
 🚀 Quick Start
 
+# Clone the repository
 git clone https://github.com/TakeshiDaiki/OlymTrade_bot
-cd sniper-bot
+
+# Install dependencies
 pip install -r requirements.txt
-python main.py
+
+# Run the Application
+python gui.py
+
+
 
 ## 🔧 Configuration
 
@@ -106,23 +120,21 @@ Adjust behavior in `config.py`:
 📁 Project Structure
 
 OlymTrade_bot/
-│
-├── core/
-│ ├── browser.py # Main Selenium automation (browser control)
-│ └── risk.py # Risk management logic
-│
-├── logic/
-│ ├── init.py
-│ ├── indicators.py # Technical indicators
-│ └── strategy.py # Trading strategy implementation
-│
-├── config.py # Global configuration settings
-├── gui.py # Optional GUI / user interface logic
-├── main.py # Main entry point of the bot
-│
-├── requirements.txt # Python dependencies
-├── .gitignore # Ignored files for Git
-└── README.md # Project documentation
+├── core/                        # ENGINE LAYER: Browser & DOM interaction
+│   ├── browser.py               # Selenium encapsulation & automation methods
+├── logic/                       # INTELLIGENCE LAYER: Strategy & Indicators
+│   ├── indicators.py            # Technical analysis (ZigZag & Wick math)
+│   └── strategy.py              # Decision logic (Signal generation)
+├── dist/                        # DEPLOYMENT: Standalone binary (Git-ignored)
+│   └── SniperBot_Olymp/         # Compiled portable application folder
+│       ├── _internal/           # Binary dependencies & Python runtime
+│       ├── core/ & logic/       # Local copies for the executable
+│       └── SniperBot_Olymp.exe  # Main entry point for Windows users
+├── config.py                    # SINGLE SOURCE OF TRUTH: Constants & Selectors
+├── gui.py                       # INTERFACE: Modern UI & Process Management
+├── main.py                      # CONTROLLER: Orchestrates the trading loop
+├── requirements.txt             # DEPENDENCIES: Manifest for environment setup
+└── .gitignore                   # VERSION CONTROL: Exclusion rules (build, dist, pycache)
 
 ## Scripts Reference
 
