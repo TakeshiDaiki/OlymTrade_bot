@@ -1,13 +1,27 @@
 import time
 import sys
+import os
 from datetime import datetime
+
+# ==========================================================
+# PATH CONFIGURATION (CRITICAL FOR .EXE)
+# ==========================================================
+# Ensures the bot finds 'config.py' and the 'core'/'logic' folders
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+
+# Importing local modules
+import config
 from core.browser import TradingBrowser
 from logic.indicators import create_candle
 from logic.strategy import analyze_signal
-import config
 
 
 def main(max_trades=10, max_losses=3):
+    # Force standard output to be visible in the GUI console immediately
+    sys.stdout.reconfigure(encoding='utf-8')
+
     print("\n" + "=" * 40)
     print(f"   AUTOMATED TRADING SYSTEM - SNIPER")
     print(f"   LIMITS: {max_trades} Trades | {max_losses} Losses")
@@ -25,7 +39,7 @@ def main(max_trades=10, max_losses=3):
         current_ticks = []
 
         while True:
-            # 1. VERIFICACIÓN DE LÍMITES
+            # 1. LIMIT VERIFICATION
             if trades_completed >= max_trades:
                 print("\n[FINISH] Daily trade limit reached.")
                 break
@@ -40,9 +54,9 @@ def main(max_trades=10, max_losses=3):
             if price:
                 current_ticks.append(price)
 
-                # MONITOR VISUAL (Cada 5 segundos)
+                # VISUAL MONITOR (Every 5 seconds)
                 if now.second % 5 == 0:
-                    # Chequeo automático de resultado después de 70 segundos
+                    # Automatic result check after 70 seconds
                     if is_trading and (time.time() - last_trade_time) > 70:
                         result = bot.get_last_result()
                         if result == "LOSS":
@@ -55,10 +69,9 @@ def main(max_trades=10, max_losses=3):
                             is_trading = False
 
                     status = f"Losses: {losses_detected}/{max_losses} | Trades: {trades_completed}/{max_trades}"
-                    # Nota: Quitamos el \r (carro de retorno) para que se vea bien en la consola de la App
                     print(f"[{asset}] {price} | Candles: {len(closed_candles)} | {status}")
 
-            # 2. ANÁLISIS DE SEÑALES
+            # 2. SIGNAL ANALYSIS
             if now.second == 0 and len(current_ticks) > 20:
                 print(f"[{now.strftime('%H:%M')}] Analyzing market...")
                 new_candle = create_candle(current_ticks)
@@ -87,8 +100,7 @@ def main(max_trades=10, max_losses=3):
 
 
 if __name__ == "__main__":
-    # Esta parte detecta si la GUI envió argumentos
-    # Ejemplo: python main.py 15 5
+    # Detect arguments sent by the GUI (gui.py -> subprocess)
     if len(sys.argv) > 2:
         try:
             arg_trades = int(sys.argv[1])
@@ -98,5 +110,5 @@ if __name__ == "__main__":
             print("[!] Invalid arguments from GUI. Using defaults.")
             main()
     else:
-        # Si lo corres manual, aún puedes usar los inputs o defaults
+        # For manual execution
         main()

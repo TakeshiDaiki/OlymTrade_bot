@@ -1,50 +1,54 @@
 # =========================
-# Python
+# Python & Core
 # =========================
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
+.python-version
 
 # Virtual environments
 venv/
 env/
 .venv/
+ENV/
 
 # =========================
-# PyCharm / JetBrains
+# PyInstaller (Compilación Final)
 # =========================
-.idea/
-*.iml
-
-# =========================
-# Environment variables
-# =========================
-.env
-
-# =========================
-# Logs
-# =========================
-*.log
-
-# =========================
-# OS files
-# =========================
-.DS_Store
-Thumbs.db
-
-# =========================
-# Selenium / Chrome temp data
-# =========================
-selenium-profile/
-chrome-profile/
-chromedriver.exe
-geckodriver.exe
-
-# =========================
-# PyInstaller (NUEVO)
-# =========================
+# No queremos subir los ejecutables ni los archivos temporales de construcción
 build/
 dist/
 *.spec
 _internal/
+
+# =========================
+# IDEs (PyCharm / VS Code)
+# =========================
+.idea/
+.vscode/
+*.iml
+*.workspace
+
+# =========================
+# Selenium & Browser Drivers
+# =========================
+# Los drivers se descargan por código o van en el ZIP, no en el código fuente
+chromedriver.exe
+geckodriver.exe
+msedgedriver.exe
+selenium-profile/
+chrome-profile/
+
+# =========================
+# Logs & Environment
+# =========================
+*.log
+.env
+local_settings.py
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
