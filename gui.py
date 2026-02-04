@@ -3,124 +3,124 @@ import threading
 import subprocess
 import sys
 import os
+import multiprocessing
 
-# Appearance Configuration
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
+
 
 class SniperApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        # Window Configuration
-        self.title("Sniper Trading Hub v1.0")
-        self.geometry("600x700")
-        self.process = None  # To store the running trading process
+        self.title("OLYMP TRADE SNIPER")
+        self.geometry("600x600")  # Un poco más grande
+        self.resizable(False, False)
+        self.process = None
 
         # --- HEADER ---
-        self.label = ctk.CTkLabel(self, text="OLYMP TRADE SNIPER", font=("Roboto", 24, "bold"))
-        self.label.pack(pady=20)
+        self.label = ctk.CTkLabel(self, text="SNIPER ENGINE v1.0", font=("Roboto", 24, "bold"))
+        self.label.pack(pady=(20, 10))
 
-        # --- INPUTS ---
-        self.input_frame = ctk.CTkFrame(self)
-        self.input_frame.pack(pady=10, padx=20, fill="x")
+        # --- CENTERED INPUTS ---
+        self.input_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.input_frame.pack(pady=10)
 
-        # Trade Limit Field
-        ctk.CTkLabel(self.input_frame, text="Trade Limit:", font=("Roboto", 14)).grid(row=0, column=0, padx=20, pady=15)
-        self.trades_entry = ctk.CTkEntry(self.input_frame, width=100)
+        ctk.CTkLabel(self.input_frame, text="Trades:", font=("Roboto", 14)).grid(row=0, column=0, padx=10, pady=5)
+        self.trades_entry = ctk.CTkEntry(self.input_frame, width=80, height=35, font=("Roboto", 14), justify="center")
         self.trades_entry.insert(0, "10")
-        self.trades_entry.grid(row=0, column=1, padx=20)
+        self.trades_entry.grid(row=0, column=1, padx=10)
 
-        # Stop Loss Field
-        ctk.CTkLabel(self.input_frame, text="Stop Loss (Max Losses):", font=("Roboto", 14)).grid(row=1, column=0, padx=20, pady=15)
-        self.sl_entry = ctk.CTkEntry(self.input_frame, width=100)
+        ctk.CTkLabel(self.input_frame, text="SL:", font=("Roboto", 14)).grid(row=0, column=2, padx=10, pady=5)
+        self.sl_entry = ctk.CTkEntry(self.input_frame, width=80, height=35, font=("Roboto", 14), justify="center")
         self.sl_entry.insert(0, "3")
-        self.sl_entry.grid(row=1, column=1, padx=20)
+        self.sl_entry.grid(row=0, column=3, padx=10)
 
-        # --- ACTION BUTTONS ---
-        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.button_frame.pack(pady=20)
+        # --- BUTTONS ---
+        self.btn_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.btn_frame.pack(pady=20)
 
-        self.start_btn = ctk.CTkButton(self.button_frame, text="START ENGINE", height=40, width=140,
-                                       font=("Roboto", 15, "bold"), fg_color="#1f538d", command=self.launch_bot)
-        self.start_btn.grid(row=0, column=0, padx=10)
+        self.start_btn = ctk.CTkButton(self.btn_frame, text="START ENGINE", width=160, height=40,
+                                       font=("Roboto", 14, "bold"), command=self.launch_bot)
+        self.start_btn.grid(row=0, column=0, padx=15)
 
-        self.stop_btn = ctk.CTkButton(self.button_frame, text="STOP ENGINE", height=40, width=140,
-                                      font=("Roboto", 15, "bold"), fg_color="#942727", state="disabled", command=self.stop_bot)
-        self.stop_btn.grid(row=0, column=1, padx=10)
+        self.stop_btn = ctk.CTkButton(self.btn_frame, text="STOP ENGINE", width=160, height=40,
+                                      font=("Roboto", 14, "bold"), command=self.stop_bot,
+                                      fg_color="#942727", state="disabled")
+        self.stop_btn.grid(row=0, column=1, padx=15)
 
-        # --- ACTIVITY LOG ---
-        self.console_label = ctk.CTkLabel(self, text="Activity Log:", font=("Roboto", 12))
-        self.console_label.pack(anchor="w", padx=25)
-
-        self.console = ctk.CTkTextbox(self, height=300, fg_color="#121212", text_color="#00FF41", font=("Consolas", 12))
-        self.console.pack(padx=20, pady=(0, 20), fill="both", expand=True)
+        # --- CONSOLE ---
+        self.console = ctk.CTkTextbox(self, height=300, fg_color="#000000", text_color="#00FF41",
+                                      font=("Consolas", 12), border_width=1, wrap="none")
+        self.console.pack(padx=20, pady=10, fill="both", expand=True)
+        self.console.configure(state="disabled")
 
     def log(self, text):
-        """Adds text to the app's console"""
+        """Advanced logging with overwrite support"""
+        self.console.configure(state="normal")
+
+        # If line starts with @@, we delete the previous line before printing
+        if text.startswith('@@'):
+            self.console.delete("end-2c linestart", "end-1c")
+            text = text.replace('@@', '')
+
         self.console.insert("end", text)
         self.console.see("end")
+        self.console.configure(state="disabled")
 
     def stop_bot(self):
-        """Terminates the running trading process and all child processes (Browser)"""
         if self.process:
             try:
-                # /F = Force | /T = Terminate child processes (Chrome)
+                # Cleaner kill
                 subprocess.run(['taskkill', '/F', '/T', '/PID', str(self.process.pid)],
                                capture_output=True, creationflags=0x08000000)
-                self.log("\n[SYSTEM] Stopping Engine... Cleaning up resources.\n")
-            except Exception as e:
-                self.log(f"\n[ERROR] Could not stop process: {e}\n")
+                self.log("\n[SYSTEM] Engine Stopped.")
+            except Exception as err:
+                self.log(f"\n[INFO] Shutdown info: {err}")
+
+            self.start_btn.configure(state="normal", text="START ENGINE")
+            self.stop_btn.configure(state="disabled")
 
     def launch_bot(self):
-        """Starts the bot in a separate thread to keep the UI responsive"""
         self.start_btn.configure(state="disabled", text="RUNNING...")
         self.stop_btn.configure(state="normal")
+        self.console.configure(state="normal")
         self.console.delete("1.0", "end")
+        self.console.configure(state="disabled")
         threading.Thread(target=self.run_process, daemon=True).start()
 
     def run_process(self):
-        trades = self.trades_entry.get()
-        sl = self.sl_entry.get()
-        create_no_window = 0x08000000
+        trades, sl = self.trades_entry.get(), self.sl_entry.get()
+        main_path = os.path.join(os.path.dirname(__file__), "main.py")
 
-        # Environment detection
         if getattr(sys, 'frozen', False):
-            base_path = os.path.dirname(sys.executable)
-            main_path = os.path.join(base_path, "main.py")
-            command = ["python", main_path, trades, sl]
+            cmd = [sys.executable, trades, sl]
         else:
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            main_path = os.path.join(current_dir, "main.py")
-            command = [sys.executable, main_path, trades, sl]
-
-        self.log(f"--- Launching Engine (Limits: {trades}T, {sl}SL) ---\n")
+            cmd = [sys.executable, "-u", main_path, trades, sl]
 
         try:
-            self.process = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=1,
-                encoding="utf-8",
-                shell=False,
-                creationflags=create_no_window
-            )
-
-            if self.process.stdout:
-                for line in self.process.stdout:
+            self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                            text=True, bufsize=1, universal_newlines=True,
+                                            creationflags=0x08000000)
+            while True:
+                line = self.process.stdout.readline()
+                if not line and self.process.poll() is not None:
+                    break
+                if line:
                     self.log(line)
+        except Exception as err:
+            self.log(f"Critical Error: {err}")
 
-            self.process.wait()
-        except Exception as e:
-            self.log(f"\n[SYSTEM ERROR]: {str(e)}\n")
-
-        self.log("\n--- Process Finished ---\n")
         self.start_btn.configure(state="normal", text="START ENGINE")
         self.stop_btn.configure(state="disabled")
-        self.process = None
+
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
+    if len(sys.argv) > 1:
+        from main import main as start_trading
+
+        start_trading(max_trades=int(sys.argv[1]), max_losses=int(sys.argv[2]))
+        sys.exit(0)
     app = SniperApp()
     app.mainloop()

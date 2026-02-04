@@ -3,15 +3,11 @@ import sys
 import os
 from datetime import datetime
 
-# ==========================================================
-# PATH CONFIGURATION (CRITICAL FOR .EXE)
-# ==========================================================
-# Ensures the bot finds 'config.py' and the 'core'/'logic' folders
+# Path configuration
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
-# Importing local modules
 import config
 from core.browser import TradingBrowser
 from logic.indicators import create_candle
@@ -19,32 +15,42 @@ from logic.strategy import analyze_signal
 
 
 def main(max_trades=10, max_losses=3):
-    # Force standard output to be visible in the GUI console immediately
+    """Main trading engine loop"""
     sys.stdout.reconfigure(encoding='utf-8')
 
-    print("\n" + "=" * 40)
-    print(f"   AUTOMATED TRADING SYSTEM - SNIPER")
-    print(f"   LIMITS: {max_trades} Trades | {max_losses} Losses")
-    print("=" * 40 + "\n")
+    # 1. IMMEDIATE BROWSER INITIALIZATION
+    print(">>> OPENING CHROME... PLEASE WAIT", flush=True)
+    try:
+        bot = TradingBrowser()
+        bot.start()
+    except Exception as err_bot:
+        print(f"\n[CRITICAL ERROR] Failed to launch browser: {err_bot}", flush=True)
+        return
 
-    bot = TradingBrowser()
+    # 2. SYSTEM COUNTDOWN - FORCED OVERWRITE FORMAT
+    print("\n>>> SYSTEM INITIALIZING: PLEASE LOG IN", flush=True)
+    for i in range(120, 0, -1):
+        # We use a unique prefix @@ to tell the GUI: "DELETE LAST LINE BEFORE PRINTING THIS"
+        sys.stdout.write(f"@@Initializing in: {i}s... Please login and set the asset.\n")
+        sys.stdout.flush()
+        time.sleep(1)
+
+    print("\n[OK] Monitoring started.\n", flush=True)
+
     trades_completed = 0
     losses_detected = 0
     is_trading = False
-    last_trade_time = 0
+    entry_price = 0.0
+    expiry_time = 0.0
+    current_side = None
 
     try:
-        bot.start()
         closed_candles = []
         current_ticks = []
 
         while True:
-            # 1. LIMIT VERIFICATION
-            if trades_completed >= max_trades:
-                print("\n[FINISH] Daily trade limit reached.")
-                break
-            if losses_detected >= max_losses:
-                print("\n[STOP LOSS] Max loss limit reached. Stopping bot.")
+            if trades_completed >= max_trades or losses_detected >= max_losses:
+                print("\n[FINISH] Limits reached.", flush=True)
                 break
 
             now = datetime.now()
@@ -53,62 +59,49 @@ def main(max_trades=10, max_losses=3):
 
             if price:
                 current_ticks.append(price)
+                status = f"L: {losses_detected}/{max_losses} | T: {trades_completed}/{max_trades}"
 
-                # VISUAL MONITOR (Every 5 seconds)
-                if now.second % 5 == 0:
-                    # Automatic result check after 70 seconds
-                    if is_trading and (time.time() - last_trade_time) > 70:
-                        result = bot.get_last_result()
-                        if result == "LOSS":
-                            losses_detected += 1
-                            print("\n[RESULT] Last trade: LOSS [X]")
-                        elif result == "WIN":
-                            print("\n[RESULT] Last trade: WIN [OK]")
+                # RESULT DETECTION
+                if is_trading and time.time() >= expiry_time:
+                    exit_price = price
+                    if exit_price == entry_price:
+                        res_msg = "TIE"
+                    elif current_side == "CALL":
+                        res_msg = "WIN" if exit_price > entry_price else "LOSS"
+                    else:
+                        res_msg = "WIN" if exit_price < entry_price else "LOSS"
 
-                        if result != "PENDING":
-                            is_trading = False
+                    if res_msg == "LOSS": losses_detected += 1
+                    print(f"\n[RESULT] {current_side} @ {entry_price} -> {exit_price} | {res_msg}\n", flush=True)
+                    is_trading = False
 
-                    status = f"Losses: {losses_detected}/{max_losses} | Trades: {trades_completed}/{max_trades}"
-                    print(f"[{asset}] {price} | Candles: {len(closed_candles)} | {status}")
+                # CANDLE LOGIC
+                if now.second == 0 and len(current_ticks) > 5:
+                    # FIXED LINE when candle closes
+                    print(f"[{now.strftime('%H:%M')}] {asset}: {price} | Candle Closed | {status}", flush=True)
 
-            # 2. SIGNAL ANALYSIS
-            if now.second == 0 and len(current_ticks) > 20:
-                print(f"[{now.strftime('%H:%M')}] Analyzing market...")
-                new_candle = create_candle(current_ticks)
-                closed_candles.append(new_candle)
-                current_ticks = []
+                    new_candle = create_candle(current_ticks)
+                    closed_candles.append(new_candle)
+                    current_ticks = []
 
-                if len(closed_candles) >= config.MIN_CANDLE_HISTORY:
-                    signal = analyze_signal(closed_candles, config.ZIGZAG_DEVIATION)
-
-                    if signal and (time.time() - last_trade_time) > 60:
-                        if bot.execute_order(signal):
-                            trades_completed += 1
-                            is_trading = True
-                            last_trade_time = time.time()
-                            print(f"[{now.strftime('%H:%M')}] Order {signal} placed successfully!")
+                    if len(closed_candles) >= config.MIN_CANDLE_HISTORY:
+                        signal = analyze_signal(closed_candles, config.ZIGZAG_DEVIATION)
+                        if signal and not is_trading:
+                            if bot.execute_order(signal):
+                                trades_completed += 1
+                                is_trading = True
+                                entry_price = price
+                                current_side = signal
+                                expiry_time = time.time() + 60
+                                print(f"[{now.strftime('%H:%M')}] {signal} ORDER PLACED AT {entry_price}", flush=True)
                 else:
-                    print(f"Building history: {len(closed_candles)}/{config.MIN_CANDLE_HISTORY}")
+                    # LIVE UPDATE - We use @@ to tell GUI to overwrite
+                    sys.stdout.write(f"@@[{now.strftime('%H:%M:%S')}] {asset}: {price} | Live... | {status}\n")
+                    sys.stdout.flush()
 
             time.sleep(0.5)
 
-    except Exception as e:
-        print(f"\n[ERROR] Unexpected error: {e}")
+    except Exception as err_loop:
+        print(f"\n[ERROR] System Failure: {err_loop}", flush=True)
     finally:
         bot.close()
-        print("Driver closed. Session finished.")
-
-
-if __name__ == "__main__":
-    # Detect arguments sent by the GUI (gui.py -> subprocess)
-    if len(sys.argv) > 2:
-        try:
-            arg_trades = int(sys.argv[1])
-            arg_losses = int(sys.argv[2])
-            main(max_trades=arg_trades, max_losses=arg_losses)
-        except ValueError:
-            print("[!] Invalid arguments from GUI. Using defaults.")
-            main()
-    else:
-        # For manual execution
-        main()
