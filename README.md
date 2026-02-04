@@ -1,67 +1,125 @@
-Sniper-Bot – Automated Trading System (Olymp Trade)
+# Sniper-Bot — Market Automation & Technical Analysis System (Olymp Trade)
 
-A production-ready automated trading bot featuring real-time candlestick analysis, ZigZag indicator integration, 
-Wick Rejection filters, and a scalable modular architecture. Built with Python 3.10+ and Selenium.
+Sniper-Bot is a modular **technical analysis and market automation framework** built with **Python 3.10+** 
+and **Selenium**.
 
-🚀 Features
+It features real-time candlestick monitoring, ZigZag pivot detection, wick rejection filtering, and configurable 
+risk-management rules.  
+This project was designed as a **portfolio-grade automation system** with clean architecture and extensibility in mind.
 
-Real-time market interaction via Selenium
+---
 
-ZigZag-based pivot detection
+## 🚀 Features
 
-Wick Rejection (price action) filtering for high-precision entries
+- Real-time market interaction via Selenium WebDriver  
+- ZigZag-based pivot point detection  
+- Wick Rejection (price action) filtering for higher-quality signals  
+- Dynamic Stop Loss and daily trade limit controls  
+- Modular and scalable project structure  
+- Standalone Windows executable build (optional)
 
-Dynamic Stop Loss and daily trade limit management
+---
 
-Modular, production-ready codebase suitable for portfolio projects
+## ⚙️ How It Works
 
-## 🚀 Getting Started (Portable Version)
+1. The bot launches Olymp Trade using Selenium.  
+2. The user has **3 minutes** to log in manually and configure the platform.  
+3. After login, the engine starts collecting OHLC candlestick data.  
+4. Trading signals are generated using:
 
-If you downloaded the `.zip` release, you don't need to install Python or any dependencies:
+   - ZigZag pivot detection  
+   - Wick rejection confirmation  
 
-1. **Extract** the ZIP file to a folder of your choice.
-2. **Open** `config.py` with any text editor (like Notepad) to adjust your trading parameters.
-3. **Run** `SniperBot_Olymp.exe` to start the application.
+5. Risk rules prevent overtrading by enforcing:
 
-## ⚙️ Configuration
+   - Maximum consecutive losses  
+   - Daily trade execution limits  
 
-One of the best features of this bot is that you can customize it without recompiling. Locate the `config.py` file in the main folder to modify:
+---
 
-* **Candle Settings:** Change the timeframe for analysis.
-* **Strategy Parameters:** Adjust ZigZag deviation and indicator sensitivity.
-* **Technical Limits:** Define minimum history required before the first trade.
+## 📦 Portable Version (Windows EXE)
 
-> **Note:** The bot reads this file every time the engine starts, so you can tweak your strategy on the fly!
+If you downloaded the standalone `.zip` release, no Python installation is required:
 
-⚙️ Core Functionality
+1. Extract the ZIP file anywhere on your PC  
+2. Open `config.py` to adjust trading parameters  
+3. Run:
 
-Real-time OHLC candlestick fetching
+   - `SniperBot_Olymp.exe`
 
-Pivot point detection using configurable ZigZag deviation
+---
 
-Wick-to-body ratio filtering (WICK_FACTOR = 0.35)
+## 🚀 Quick Start (Developers)
 
-Automatic trade execution simulation
+### Clone the Repository
 
-Consecutive loss monitoring and trade limits
+```bash
+git clone https://github.com/TakeshiDaiki/OlymTrade_bot
+cd OlymTrade_bot
+```
 
-Risk management with configurable Stop Loss
+### Install Dependencies
 
-🧑‍💻 Developer Experience
+pip install -r requirements.txt
 
-Modular architecture (core / logic / config)
+### Run the Application
 
-PEP8-compliant code
+python gui.py
 
-Centralized configuration management (config.py)
+### 🔧 Configuration
 
-Real-time logging and debugging support
+All strategy parameters are centralized in:
 
-Easily extensible for multi-platform trading
+config.py
 
-🛠️ Tech Stack
+You can modify behavior without recompiling the project.
 
-Backend
+## 🔧 Configuration Parameters
+
+| Parameter          |  Description                                    |
+|--------------------|-------------------------------------------------|
+| ZIGZAG_DEVIATION   | ZigZag pivot sensitivity                        |
+| WICK_FACTOR        | Minimum wick rejection ratio (0.35 recommended) |
+| ZZ_TOLERANCE       | Pivot touch tolerance                           |
+| MAX_LOSSES         | Max consecutive losses allowed                  |
+| MAX_TRADES_PER_DAY | Daily trade execution limit                     |
+
+
+
+## 📚 Strategy Logic
+
+| Indicator         |  Condition              | Description                    |
+|-------------------|-------------------------|--------------------------------|
+| ZigZag            | Pivot detected          | Identifies high/low pivots     |
+| Wick Rejection    | Wick/Body > WICK_FACTOR | Confirms price rejection       |
+| Stop Loss         | Configured              | Limits consecutive losses      |
+| Daily Trade Limit | Configured              | Prevents excessive executions  |
+
+
+
+### 📁 Project Structure
+``` text 
+OlymTrade_bot/
+├── core/                        # ENGINE LAYER: Browser & DOM interaction
+│   └── browser.py               # Selenium encapsulation & automation methods
+│
+├── logic/                       # INTELLIGENCE LAYER: Strategy & Indicators
+│   ├── indicators.py            # Technical analysis (ZigZag & Wick math)
+│   └── strategy.py              # Decision logic (signal generation)
+│
+├── dist/                        # DEPLOYMENT: Standalone binary (Git-ignored)
+│   └── SniperBot_Olymp/         # Compiled portable application folder
+│       ├── _internal/           # Binary dependencies & Python runtime
+│       └── SniperBot_Olymp.exe  # Main Windows executable
+│
+├── config.py                    # SINGLE SOURCE OF TRUTH: Constants & Selectors
+├── gui.py                       # INTERFACE: Modern UI & process management
+├── main.py                      # CONTROLLER: Orchestrates the execution loop
+├── requirements.txt             # Python dependencies manifest
+└── .gitignore                   # Version control exclusions
+```
+
+### 🛠️ Tech Stack
 
 Python 3.10+
 
@@ -69,108 +127,32 @@ Selenium WebDriver
 
 WebDriver Manager (Chrome)
 
-DevOps
+Git + GitHub
 
-Git & GitHub
+Modular architecture (core / logic separation)
 
-.env configuration for sensitive credentials
+## 📌 Scripts Reference
 
-pip / requirements.txt dependency management
-
-📦 Installation
-Prerequisites
-
-Python 3.10+
-
-Chrome Browser
-
-Selenium WebDriver
-
-🛠️ Installation & Usage
-For Users (Standalone EXE)
-Go to the Releases section in this repository.
-
-Download the SniperBot_v1_Build.zip.
-
-Extract the folder and run SniperBot_Olymp.exe.
-
-🚀 Quick Start
-
-# Clone the repository
-git clone https://github.com/TakeshiDaiki/OlymTrade_bot
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the Application
-python gui.py
+| Command                            | Description                  |
+|------------------------------------|------------------------------|
+| python gui.py                      | Launch the full application  |
+| python main.py                     | Start the automation engine  |
+| pip install -r requirements.txt    | Install required libraries   |
 
 
 
-## 🔧 Configuration
-
-Adjust behavior in `config.py`:
-
-| Parameter          | Description                                     |
-|--------------------|-------------------------------------------------|
-| ZIGZAG_DEVIATION   | Sensitivity of ZigZag pivot detection           |
-| WICK_FACTOR        | Minimum wick rejection ratio (0.35 recommended) |
-| ZZ_TOLERANCE       | Tolerance when touching historical pivots       |
-| MAX_LOSSES         | Max allowed consecutive losses                  |
-| MAX_TRADES_PER_DAY | Daily trade limit                               |
-
-
-
-
-## 📚 Strategy Documentation
-
-### 🧠 Strategy Logic
-
-| Indicator         | Condition               | Description               |
-|-------------------|-------------------------|---------------------------|
-| ZigZag            | Pivot detected          | Identify high/low pivots  |
-| Wick Rejection    | Wick/Body > WICK_FACTOR | Confirms price rejection  |
-| Stop Loss         | Configured              | Limits losses             |
-| Daily Trade Limit | Configured              | Risk management control   |
-
-
-
-📁 Project Structure
-```text
-OlymTrade_bot/
-├── core/                        # ENGINE LAYER: Browser & DOM interaction
-│   ├── browser.py               # Selenium encapsulation & automation methods
-├── logic/                       # INTELLIGENCE LAYER: Strategy & Indicators
-│   ├── indicators.py            # Technical analysis (ZigZag & Wick math)
-│   └── strategy.py              # Decision logic (Signal generation)
-├── dist/                        # DEPLOYMENT: Standalone binary (Git-ignored)
-│   └── SniperBot_Olymp/         # Compiled portable application folder
-│       ├── _internal/           # Binary dependencies & Python runtime
-│       ├── core/ & logic/       # Local copies for the executable
-│       └── SniperBot_Olymp.exe  # Main entry point for Windows users
-├── config.py                    # SINGLE SOURCE OF TRUTH: Constants & Selectors
-├── gui.py                       # INTERFACE: Modern UI & Process Management
-├── main.py                      # CONTROLLER: Orchestrates the trading loop
-├── requirements.txt             # DEPENDENCIES: Manifest for environment setup
-└── .gitignore                   # VERSION CONTROL: Exclusion rules (build, dist, pycache)
-```
-## Scripts Reference
-
-| Command                         | Description             |
-|---------------------------------|-------------------------|
-| python main.py                  | Start the trading bot   |
-| pip install -r requirements.txt | Install dependencies    |
-
-
-👤 Author
+### 👤 Author
 
 José Salazar
-Software Developer focused on automation, algorithmic trading and AI
+Software Developer focused on automation, algorithmic systems, and AI.
+
 LinkedIn: https://www.linkedin.com/in/jose-salazar-60ab21283/
+
 GitHub: https://github.com/TakeshiDaiki
 
-⚠️ Important Note
+### ⚠️ Disclaimer
 
-This bot is a demonstration and portfolio project only.
-It is not recommended for live trading without extensive testing and validation.
-The author is not responsible for any financial losses.
+This project is provided for educational and portfolio purposes only.
+It is not intended for live trading without extensive testing and validation.
+
+The author is not responsible for any financial losses or misuse of this software.
