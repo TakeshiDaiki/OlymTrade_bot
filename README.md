@@ -118,7 +118,7 @@ Adjust behavior in `config.py`:
 
 
 📁 Project Structure
-
+```text
 OlymTrade_bot/
 ├── core/                        # ENGINE LAYER: Browser & DOM interaction
 │   ├── browser.py               # Selenium encapsulation & automation methods
@@ -135,7 +135,7 @@ OlymTrade_bot/
 ├── main.py                      # CONTROLLER: Orchestrates the trading loop
 ├── requirements.txt             # DEPENDENCIES: Manifest for environment setup
 └── .gitignore                   # VERSION CONTROL: Exclusion rules (build, dist, pycache)
-
+```
 ## Scripts Reference
 
 | Command                         | Description             |
