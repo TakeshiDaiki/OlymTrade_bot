@@ -30,12 +30,12 @@ class TradingBrowser:
         """Starts the browser and waits for manual login/setup."""
         self.driver.get(config.URL)
         print("\n" + "=" * 55)
-        print("🚀 LOGIN AND OPEN THE CLOSED DEALS PANEL (60s)")
+        print(">>> LOGIN AND OPEN THE CLOSED DEALS PANEL (60s)")
         print("=" * 55)
         for i in range(60, 0, -1):
             print(f"Bot active in: {i}s...   ", end="\r")
             time.sleep(1)
-        print("\n✅ Monitoring started.\n")
+        print("\n[OK] Monitoring started.\n")
 
     def get_current_asset(self):
         """Extracts the asset name from the window title."""
@@ -67,7 +67,7 @@ class TradingBrowser:
             selector = config.SELECTORS['btn_up'] if direction == "UP" else config.SELECTORS['btn_down']
             button = self.wait.until(ec.element_to_be_clickable((By.CSS_SELECTOR, selector)))
             button.click()
-            print(f"\n[{datetime.now().strftime('%H:%M:%S')}] ✅ {direction} ORDER PLACED")
+            print(f"\n[{datetime.now().strftime('%H:%M:%S')}] [OK] {direction} ORDER PLACED")
             return True
         except (TimeoutException, WebDriverException, NoSuchElementException):
             print(f"\n[ERROR] The {direction} button is not available.")

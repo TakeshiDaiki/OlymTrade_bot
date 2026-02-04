@@ -1,0 +1,42 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# =========================
+# PyCharm / JetBrains
+# =========================
+.idea/
+*.iml
+
+# =========================
+# Environment variables
+# =========================
+.env
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Selenium / Chrome temp data
+# =========================
+selenium-profile/
+chrome-profile/
+chromedriver.exe
+geckodriver.exe

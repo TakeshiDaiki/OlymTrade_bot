@@ -105,17 +105,24 @@ Adjust behavior in `config.py`:
 
 📁 Project Structure
 
-sniper-bot/
+OlymTrade_bot/
+│
 ├── core/
-│   └── browser.py       # Selenium automation engine
+│ ├── browser.py # Main Selenium automation (browser control)
+│ └── risk.py # Risk management logic
+│
 ├── logic/
-│   ├── indicators.py    # ZigZag & OHLC calculation
-│   ├── strategy.py      # Trade decision logic
-│   └── risk.py          # Risk management logic
-├── config.py            # Configurable parameters
-├── main.py              # Entry point
-├── requirements.txt
-└── README.md
+│ ├── init.py
+│ ├── indicators.py # Technical indicators
+│ └── strategy.py # Trading strategy implementation
+│
+├── config.py # Global configuration settings
+├── gui.py # Optional GUI / user interface logic
+├── main.py # Main entry point of the bot
+│
+├── requirements.txt # Python dependencies
+├── .gitignore # Ignored files for Git
+└── README.md # Project documentation
 
 ## Scripts Reference
 
